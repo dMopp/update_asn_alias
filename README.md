@@ -1,7 +1,6 @@
+# update_asn_alias for OPNsense (ASN/IP/Network Routing)
 
-# update_asn_alias for OPNsense
-
-This setup allows you to route traffic for specific Autonomous Systems (ASNs) through a WireGuard tunnel on OPNsense.
+This setup allows you to route traffic for specific Autonomous Systems (ASNs), specific IPs **or networks** through a (WireGuard) tunnel on OPNsense.
 
 ---
 
@@ -42,7 +41,7 @@ These will be filled dynamically by the script later.
 2. Create **two rules** (one for IPv4, one for IPv6):
 
    - **General**
-     - **Disabled**: *Checked* (so you can enable later safely)
+     - **Disabled**: *Checked* (recommended for testing — once aliases are filled, you can enable the rules)
      - **Action**: Pass
      - **Quick**: Checked
      - **Interface**: All (or limit to where routing should apply)
@@ -74,6 +73,8 @@ These will be filled dynamically by the script later.
    - **Source Address**: The LAN/subnet you want to route
    - **Destination Address**: Any
    - **Translation / Target**: Interface address
+
+⚠️ Without these NAT rules, return traffic may not be routed correctly through the tunnel.
 
 ---
 
@@ -130,18 +131,19 @@ Then verify in **Firewall → Aliases** that:
 - `ASN_TO_TUNNEL_V4`
 - `ASN_TO_TUNNEL_V6`
 
-contain networks as expected.
+contain networks as expected.  
+You can also check the **last update timestamp** in the alias list to confirm successful runs.
 
 ---
 
 ## 📎 Files in this Repository
 
 - [`update_asn_alias.sh`](./update_asn_alias.sh) – main update script  
-- [`asn.list`](./asn.list) – list of ASNs to be routed  
+- [`asn.list`](./asn.list) – list of ASNs/IPs/Networks to be routed  
 - [`actions_asnaliasupdate.conf`](./actions_asnaliasupdate.conf) – configd integration  
 
 ---
 
 ## 🎉 Done!
 
-Traffic matching the configured ASNs will now be routed through your WireGuard tunnel.
+Traffic matching the configured ASNs, IPs or networks will now be routed through your WireGuard tunnel.
