@@ -1,45 +1,147 @@
 
 # update_asn_alias for OPNsense
-I used that script (+ config) to route traffic for specific ASN trough my wireguard tunnel
 
+This setup allows you to route traffic for specific Autonomous Systems (ASNs) through a WireGuard tunnel on OPNsense.
 
-**Preconditions:**
-You have done setup Gateways for IPv4 and IPv6 in opnsense we could use later on.
-You have assigned an Interface for the Tunnel (no IP config required there)
+---
 
-**HowTo:**
- 1. In OPNsense under Firewall/Aliases Create two aliases (As networks, should be leave empty):
-		 3. ASN_TO_TUNNEL_V4
-		 4. ASN_TO_TUNNEL_V6
- 2. In OPNsense under Firewall/Rules/Floating create Two Rules
-	 3. Disabled: Checked
-	 4. Action: Pass
-	 5. Quick: Checked
-	 6. Interface: (All where the routing should be applied to)
-	 7. Direction: In
-	 8. TCP/IP Version IPv4 (2nd rule IPv6)
-	 9. Protocol TCP/UDP (Or whatever, up to you)
-	 10. Source: Any
-	 11. Destination: ASN_TO_TUNNEL_V4 (Or V6) Alias
-	 12. Destination Port Range: Up to you (Iam using 80/443 only)
-	 13. Gateway: The Gateway you want to Use (V4 for V4 and V6 for V6)
-Note: This rule should be run before other routing rules
-	
- 3. In OPNsense under Firewall/NAT/Outbound (Make sure Hybrid is active)
-	 4. Create Two (!) rules for every Interface
-			 6. Interface: TUNNELINTERFACE (always the same)
-			 7. TCP/IP Version V4 (2nd Rule V6)
-			 8. Protocol: Any
-			 9. Source address: The Interface you want to route (eG LAN)
-			 10. Destination Address: any 
-			 11. Translation / Target: Interface address
- 4. copy files
-	 5. Copy [update_asn_alias.sh](https://github.com/dMopp/update_asn_alias/blob/main/update_asn_alias.sh "update_asn_alias.sh") to OPNsense:/root/
-	 6. Copy [asn.list](https://github.com/dMopp/update_asn_alias/blob/main/asn.list "asn.list") to OPNsense:/root/
-	 7. Copy [actions_asnaliasupdate.conf](https://github.com/dMopp/update_asn_alias/blob/main/actions_asnaliasupdate.conf "actions_asnaliasupdate.conf") to /usr/local/opnsense/service/conf/actions.d/
-	 8. Run service configd restart on OPNsense
- 5. In OPNsense under System/Settings/Cron create a new entry:
-	 6. Minutes: 30
-	 7. Hours: 3
-	 8. Day/Month/Days: *
-	 9. Command: Update ASN aliases
+## 📋 Prerequisites
+
+Before starting, make sure you have:
+
+- Gateways for **IPv4** and **IPv6** configured (we will use them later).
+- An **interface assigned** for the WireGuard tunnel  
+  (⚠️ no IP configuration required on the tunnel interface).
+- Shell/SSH access to your OPNsense firewall.
+
+---
+
+## ⚙️ Step 1: Create Firewall Aliases
+
+1. Go to **Firewall → Aliases**.  
+2. Create two aliases:
+   - **ASN_TO_TUNNEL_V4** (type: *Networks*, leave empty for now)
+   - **ASN_TO_TUNNEL_V6** (type: *Networks*, leave empty for now)
+
+These will be filled dynamically by the script later.
+
+---
+
+## 🔑 Step 2: Create API Key
+
+1. Go to **System → Access → Users**.  
+2. Select your `root` user (or create a dedicated automation user).  
+3. Generate an **API key/secret** pair.  
+   - Save them securely — you’ll need them in the script.
+
+---
+
+## 🚦 Step 3: Create Floating Rules
+
+1. Go to **Firewall → Rules → Floating**.  
+2. Create **two rules** (one for IPv4, one for IPv6):
+
+   - **General**
+     - **Disabled**: *Checked* (so you can enable later safely)
+     - **Action**: Pass
+     - **Quick**: Checked
+     - **Interface**: All (or limit to where routing should apply)
+     - **Direction**: In
+
+   - **Network**
+     - **TCP/IP Version**: IPv4 (second rule IPv6)
+     - **Protocol**: TCP/UDP (or any you need)
+     - **Source**: Any
+     - **Destination**: `ASN_TO_TUNNEL_V4` (or `ASN_TO_TUNNEL_V6`)
+     - **Destination Port Range**: (optional, e.g. 80–443)
+
+   - **Advanced**
+     - **Gateway**: Select the WireGuard gateway (IPv4 or IPv6 accordingly)
+
+⚠️ These rules must be placed **before other routing rules**.
+
+---
+
+## 🔄 Step 4: Configure Outbound NAT
+
+1. Go to **Firewall → NAT → Outbound**.  
+2. Ensure mode is set to **Hybrid**.  
+3. Create **two rules per LAN interface** (one IPv4, one IPv6):
+
+   - **Interface**: Tunnel interface (always the same one)
+   - **TCP/IP Version**: IPv4 (second rule IPv6)
+   - **Protocol**: Any
+   - **Source Address**: The LAN/subnet you want to route
+   - **Destination Address**: Any
+   - **Translation / Target**: Interface address
+
+---
+
+## 📂 Step 5: Install the Script
+
+Copy the following files to your OPNsense box:
+
+```bash
+scp update_asn_alias.sh root@OPNsense:/root/
+scp asn.list root@OPNsense:/root/
+scp actions_asnaliasupdate.conf root@OPNsense:/usr/local/opnsense/service/conf/actions.d/
+```
+
+Then restart the service framework:
+
+```bash
+service configd restart
+```
+
+---
+
+## 🛠 Step 6: Adjust the Script
+
+Edit `/root/update_asn_alias.sh` and add your:
+
+- OPNsense API URL
+- Port
+- API key
+- API secret
+
+---
+
+## ⏰ Step 7: Schedule with Cron
+
+1. Go to **System → Settings → Cron**.  
+2. Add a new entry:
+   - **Minutes**: `30`
+   - **Hours**: `3`
+   - **Days/Months/Weekdays**: `*`
+   - **Command**: `Update ASN aliases`
+
+---
+
+## ✅ Final Check
+
+Run the script manually once:
+
+```bash
+/root/update_asn_alias.sh
+```
+
+Then verify in **Firewall → Aliases** that:
+
+- `ASN_TO_TUNNEL_V4`
+- `ASN_TO_TUNNEL_V6`
+
+contain networks as expected.
+
+---
+
+## 📎 Files in this Repository
+
+- [`update_asn_alias.sh`](./update_asn_alias.sh) – main update script  
+- [`asn.list`](./asn.list) – list of ASNs to be routed  
+- [`actions_asnaliasupdate.conf`](./actions_asnaliasupdate.conf) – configd integration  
+
+---
+
+## 🎉 Done!
+
+Traffic matching the configured ASNs will now be routed through your WireGuard tunnel.
