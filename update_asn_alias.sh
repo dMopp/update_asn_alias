@@ -5,8 +5,8 @@ set -eu
 OPNSENSE_HOST="https://WWW:XXX"
 API_KEY="YYY"
 API_SECRET="ZZZ"
-ALIAS_V4="ASN_TO_WIREGUARD_V4"
-ALIAS_V6="ASN_TO_WIREGUARD_V6"
+ALIAS_V4="ASN_TO_TUNNEL_V4"
+ALIAS_V6="ASN_TO_TUNNEL_V6"
 ASN_FILE="/root/asn.list"
 WHOIS_HOST="whois.radb.net"
 SLEEP_BETWEEN=0.3   # radb rate-limit freundlich
