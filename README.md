@@ -1,4 +1,4 @@
-# opnsense-AS-policy-routing
+# update_asn_alias for OPNsense
 I used that script (+ config) to route traffic for specific ASN trough my wireguard tunnel
 
 
