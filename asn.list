@@ -1,0 +1,20 @@
+# YouTube / Google
+AS15169   # Kern-AS von Google (youtube)
+
+# Reddit
+AS54113   # Fastly
+AS46489   # Reddit Inc.
+
+#GitHub
+AS8075   # Microsoft (GitHub)
+
+AS13335 # Cloudflare
+
+AS32934 #(Meta: Facebook/Instagram/WhatsApp)
+
+#my website
+46.38.230.224 
+2a03:4000:57:109::1
+
+#another entwork
+1.0.0.0/24
