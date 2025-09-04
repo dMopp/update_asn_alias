@@ -23,11 +23,11 @@ Before starting, make sure you have:
    - **ASN_TO_TUNNEL_V4** 
       type: *URL Table (IPs)*
       Refresh Frequency: *Empty / 1*
-      content: *file:///var/db/aliastables/ASN_TO_TUNNEL_V4.txt*
+      content: *file:///conf/_aliases/ASN_TO_TUNNEL_V4.txt*
    - **ASN_TO_TUNNEL_V6** 
      type: *URL Table (IPs)*
      Refresh Frequency: *Empty / 1*
-     content: *file:///var/db/aliastables/ASN_TO_TUNNEL_V6.txt*
+     content: *file:///conf/_aliases/ASN_TO_TUNNEL_V6.txt*
 
 These will be filled dynamically by the script later.
 
