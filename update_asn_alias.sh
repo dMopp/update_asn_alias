@@ -10,10 +10,15 @@ WHOIS_HOST="whois.radb.net"
 WHOIS_TIMEOUT=15        # in seconds
 SLEEP_BETWEEN=0.3       # radb rate-limit freundlich
 
+OPNSENSE_URL=https://gateway.quolke.net    # Valid certificate required
+OPNSENSE_PORT=4443
+
 # Veröffentlichung für URL Table (IPs)
-LOCAL_DIR="/conf/_aliases"
-V4_FILE="$LOCAL_DIR/ASN_TO_TUNNEL_V4.txt"
-V6_FILE="$LOCAL_DIR/ASN_TO_TUNNEL_V6.txt"
+WWWROOT="/usr/local/www"
+LOCAL_DIR="/_aliases"
+WEBSERVER_DIR="$WWWROOT/$LOCAL_DIR"
+V4_FILE="$WEBSERVER_DIR/$ALIAS_V4.txt"
+V6_FILE="$WEBSERVER_DIR/$ALIAS_V6.txt"
 
 # Binaries
 PFCTL="$(command -v pfctl || echo /sbin/pfctl)"
@@ -194,6 +199,6 @@ echo "Persistiert nach:"
 echo "  $V4_FILE"
 echo "  $V6_FILE"
 echo "Lokale URLs für URL Table (IPs):"
-echo "  file://$V4_FILE"
-echo "  file://$V6_FILE"
+echo "  $OPNSENSE_URL:$OPNSENSE_PORT/$LOCAL_DIR/$ALIAS_V4.txt"
+echo "  $OPNSENSE_URL:$OPNSENSE_PORT/$LOCAL_DIR/$ALIAS_V6.txt"
 echo "pfctl-Tabellen '$ALIAS_V4' und '$ALIAS_V6' wurden ersetzt."
