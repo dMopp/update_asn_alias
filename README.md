@@ -1,3 +1,4 @@
+
 # update_asn_alias for OPNsense (ASN/IP/Network Routing)
 
 This setup allows you to route traffic for specific Autonomous Systems (ASNs), specific IPs **or networks** through a (WireGuard) tunnel on OPNsense.
@@ -19,8 +20,14 @@ Before starting, make sure you have:
 
 1. Go to **Firewall → Aliases**.  
 2. Create two aliases:
-   - **ASN_TO_TUNNEL_V4** (type: *Networks*, leave empty for now)
-   - **ASN_TO_TUNNEL_V6** (type: *Networks*, leave empty for now)
+   - **ASN_TO_TUNNEL_V4** 
+      type: *URL Table (IPs)*
+      Refresh Frequency: *Empty / 1*
+      content: *file:///var/db/aliastables/ASN_TO_TUNNEL_V4.txt*
+   - **ASN_TO_TUNNEL_V6** 
+     type: *URL Table (IPs)*
+     Refresh Frequency: *Empty / 1*
+     content: *file:///var/db/aliastables/ASN_TO_TUNNEL_V6.txt*
 
 These will be filled dynamically by the script later.
 
@@ -78,7 +85,7 @@ These will be filled dynamically by the script later.
 
 ---
 
-## 📂 Step 5: Install the Script
+## 📂 Step 5: Install the Scripts
 
 Copy the following files to your OPNsense box:
 
@@ -86,6 +93,7 @@ Copy the following files to your OPNsense box:
 scp update_asn_alias.sh root@OPNsense:/root/
 scp asn.list root@OPNsense:/root/
 scp actions_asnaliasupdate.conf root@OPNsense:/usr/local/opnsense/service/conf/actions.d/
+scp actions_updateawsurltable.conf root@OPNsense:/usr/local/opnsense/service/conf/actions.d/
 ```
 
 Then restart the service framework:
@@ -115,6 +123,11 @@ Edit `/root/update_asn_alias.sh` and add your:
    - **Hours**: `3`
    - **Days/Months/Weekdays**: `*`
    - **Command**: `Update ASN aliases`
+3. Add a new entry:
+   - **Minutes**: `30`
+   - **Hours**: `2`
+   - **Days/Months/Weekdays**: `*`
+   - **Command**: `Update AWS URL Table`
 
 ---
 
@@ -147,3 +160,63 @@ You can also check the **last update timestamp** in the alias list to confirm su
 ## 🎉 Done!
 
 Traffic matching the configured ASNs, IPs or networks will now be routed through your WireGuard tunnel.
+
+
+---
+
+# AWS IP Range Updater for OPNsense
+
+This script fetches the official AWS IP ranges from  
+[`https://ip-ranges.amazonaws.com/ip-ranges.json`](https://ip-ranges.amazonaws.com/ip-ranges.json)  
+and writes selected networks (Amazon EC2 and/or CloudFront) into a target file.  
+
+The target file can be used in **OPNsense URL tables** to automatically maintain  
+a list of AWS networks for firewall rules.
+
+## Features
+- Supports both **IPv4** and **IPv6** ranges
+- Region filtering (e.g., `us-west-2`, `eu-central-1`)
+- Optional inclusion of:
+  - `AMAZON` (general AWS ranges, often EC2)
+  - `CLOUDFRONT` (content delivery edges)
+  - Global CloudFront-only mode
+- Inserts/updates a **managed block** between  
+  `# BEGIN AWS-AUTO` and `# END AWS-AUTO`  
+  without touching manual entries in the file
+- Generates deduplicated and sorted lists
+
+## Usage
+1. Adjust configuration variables at the top of the script:
+   - `REGIONS` → AWS regions to include
+   - `INCLUDE_AMAZON` / `INCLUDE_CLOUDFRONT`
+   - `CLOUDFRONT_GLOBAL_ONLY`
+   - `TARGET_FILE` → destination file for OPNsense
+
+2. Run the script manually or via **cron**:
+   ```sh
+   sh update_aws_ipranges.sh
+   ```
+
+3. Point an OPNsense **URL table alias** to the generated file.
+
+## Example
+A generated block inside `asn.list` looks like:
+
+```
+# BEGIN AWS-AUTO (managed; do not edit inside)
+# generated: 2025-09-04T21:00:00Z
+# regions: us-west-2 | amazon=1 | cloudfront=1 | cf_global_only=1
+13.34.32.0/24
+13.35.0.0/16
+...
+2600:9000::/28
+# END AWS-AUTO
+```
+
+## Requirements
+- `curl`, `jq`, `sort`, `sed`, `awk`, `mkdir`
+
+---
+
+**Note:** Only the lines inside the managed block are updated.  
+Manual entries outside this block remain untouched.
