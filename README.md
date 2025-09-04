@@ -1,4 +1,5 @@
 
+
 # update_asn_alias for OPNsense (ASN/IP/Network Routing)
 
 This setup allows you to route traffic for specific Autonomous Systems (ASNs), specific IPs **or networks** through a (WireGuard) tunnel on OPNsense.
@@ -13,6 +14,7 @@ Before starting, make sure you have:
 - An **interface assigned** for the WireGuard tunnel  
   (⚠️ no IP configuration required on the tunnel interface).
 - Shell/SSH access to your OPNsense firewall.
+- Valid SSL certificate (OR HTTP access)
 
 ---
 
@@ -111,6 +113,16 @@ service configd restart
 
 ---
 
+## 🔧 Step 6: Check Configuration
+
+Before running the final check, verify the configuration inside your
+update_asn_alias.sh script:
+
+---- Config ----
+OPNSENSE_URL="https://firewall.fqdn"   # FQDN with a valid SSL certificate OR http
+OPNSENSE_PORT="4443"                        # Typically 443 or 4443 depending on your setup (OR 80)
+
+---
 ## ✅ Final Check
 
 Run the script manually once:
