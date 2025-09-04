@@ -7,7 +7,8 @@ ALIAS_V6="ASN_TO_TUNNEL_V6"
 
 ASN_FILE="/root/asn.list"
 WHOIS_HOST="whois.radb.net"
-SLEEP_BETWEEN=0.3            # radb rate-limit freundlich
+WHOIS_TIMEOUT=15        # in seconds
+SLEEP_BETWEEN=0.3       # radb rate-limit freundlich
 
 # Veröffentlichung für URL Table (IPs)
 LOCAL_DIR="/var/db/aliastables"
@@ -55,9 +56,13 @@ fi
 
 # --- 2) Prefixes via RADb (nur wenn ASNs vorhanden) ---
 : > "$RAW_TMP"
+
 if [ -s "$ASN_TMP" ]; then
   while IFS= read -r ASN; do
-    whois -h "$WHOIS_HOST" -- "-i origin $ASN" 2>/dev/null >> "$RAW_TMP" || true
+    if ! timeout "$WHOIS_TIMEOUT" whois -h "$WHOIS_HOST" -- "-i origin $ASN" 2>/dev/null >> "$RAW_TMP"; then
+      echo "ERROR: whois lookup for $ASN failed or timed out after ${WHOIS_TIMEOUT}s." >&2
+      exit 1
+    fi
     sleep "$SLEEP_BETWEEN"
   done < "$ASN_TMP"
 fi
