@@ -104,18 +104,7 @@ service configd restart
 
 ---
 
-## 🛠 Step 6: Adjust the Script
-
-Edit `/root/update_asn_alias.sh` and add your:
-
-- OPNsense API URL
-- Port
-- API key
-- API secret
-
----
-
-## ⏰ Step 7: Schedule with Cron
+## ⏰ Step 6: Schedule with Cron
 
 1. Go to **System → Settings → Cron**.  
 2. Add a new entry:
