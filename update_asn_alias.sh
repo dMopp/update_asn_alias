@@ -15,7 +15,7 @@ OPNSENSE_PORT=4443
 
 # Veröffentlichung für URL Table (IPs)
 WWWROOT="/usr/local/www"
-LOCAL_DIR="/_aliases"
+LOCAL_DIR="_aliases"
 WEBSERVER_DIR="$WWWROOT/$LOCAL_DIR"
 V4_FILE="$WEBSERVER_DIR/$ALIAS_V4.txt"
 V6_FILE="$WEBSERVER_DIR/$ALIAS_V6.txt"
@@ -150,9 +150,9 @@ V6N=$(wc -l < "$V6_TMP" | tr -d ' ')
 ASNN=$( [ -s "$ASN_TMP" ] && wc -l < "$ASN_TMP" | tr -d ' ' || echo 0 )
 echo "Parsed: $V4N v4-Netze, $V6N v6-Netze aus $ASNN ASNs (+ direkte IPs/CIDRs)."
 
-# --- 4) Persistenz-Dateien unter $LOCAL_DIR ---
-if [ ! -d "$LOCAL_DIR" ]; then
-  mkdir -p "$LOCAL_DIR"
+# --- 4) Persistenz-Dateien unter $WEBSERVER_DIR ---
+if [ ! -d "$WEBSERVER_DIR" ]; then
+  mkdir -p "$WEBSERVER_DIR"
 fi
 # atomare Writes
 copy_atomic(){
