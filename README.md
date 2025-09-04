@@ -33,16 +33,7 @@ These will be filled dynamically by the script later.
 
 ---
 
-## 🔑 Step 2: Create API Key
-
-1. Go to **System → Access → Users**.  
-2. Select your `root` user (or create a dedicated automation user).  
-3. Generate an **API key/secret** pair.  
-   - Save them securely — you’ll need them in the script.
-
----
-
-## 🚦 Step 3: Create Floating Rules
+## 🚦 Step 2: Create Floating Rules
 
 1. Go to **Firewall → Rules → Floating**.  
 2. Create **two rules** (one for IPv4, one for IPv6):
@@ -68,7 +59,7 @@ These will be filled dynamically by the script later.
 
 ---
 
-## 🔄 Step 4: Configure Outbound NAT
+## 🔄 Step 3: Configure Outbound NAT
 
 1. Go to **Firewall → NAT → Outbound**.  
 2. Ensure mode is set to **Hybrid**.  
@@ -85,7 +76,7 @@ These will be filled dynamically by the script later.
 
 ---
 
-## 📂 Step 5: Install the Scripts
+## 📂 Step 4: Install the Scripts
 
 Copy the following files to your OPNsense box:
 
@@ -104,7 +95,7 @@ service configd restart
 
 ---
 
-## ⏰ Step 6: Schedule with Cron
+## ⏰ Step 5: Schedule with Cron
 
 1. Go to **System → Settings → Cron**.  
 2. Add a new entry:
@@ -141,8 +132,10 @@ You can also check the **last update timestamp** in the alias list to confirm su
 ## 📎 Files in this Repository
 
 - [`update_asn_alias.sh`](./update_asn_alias.sh) – main update script  
+- [`update_aws_urltable.sh`](./update_aws_urltable.sh) – aws update script
 - [`asn.list`](./asn.list) – list of ASNs/IPs/Networks to be routed  
-- [`actions_asnaliasupdate.conf`](./actions_asnaliasupdate.conf) – configd integration  
+- [`actions_asnaliasupdate.conf`](./actions_asnaliasupdate.conf) – configd integration
+- [`actions_updateawsurltable.conf`](./actions_updateawsurltable.conf) – configd integration  
 
 ---
 
