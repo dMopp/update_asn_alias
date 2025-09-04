@@ -11,7 +11,7 @@ WHOIS_TIMEOUT=15        # in seconds
 SLEEP_BETWEEN=0.3       # radb rate-limit freundlich
 
 # Veröffentlichung für URL Table (IPs)
-LOCAL_DIR="/var/db/aliastables"
+LOCAL_DIR="/conf/_aliases"
 V4_FILE="$LOCAL_DIR/ASN_TO_TUNNEL_V4.txt"
 V6_FILE="$LOCAL_DIR/ASN_TO_TUNNEL_V6.txt"
 
