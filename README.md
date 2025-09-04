@@ -118,7 +118,6 @@ service configd restart
 Before running the final check, verify the configuration inside your
 update_asn_alias.sh script:
 
----- Config ----
 OPNSENSE_URL="https://firewall.fqdn"   # FQDN with a valid SSL certificate OR http
 OPNSENSE_PORT="4443"                   # Typically 443 or 4443 depending on your setup (OR 80)
 
